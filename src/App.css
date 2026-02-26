@@ -1,0 +1,228 @@
+/* App-level styles */
+#root {
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Magic Bento Grid Layout */
+.magic-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .magic-bento-grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: minmax(280px, auto);
+  }
+
+  /* Create larger cards for variety - Bento layout */
+  /* Card 1 - Normal size */
+  .magic-bento-card:nth-child(1) {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+
+  /* Card 2 - Double width (larger) */
+  .magic-bento-card:nth-child(2) {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+
+  /* Card 3 - Normal size */
+  .magic-bento-card:nth-child(3) {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+
+  /* Card 4 - Double width (larger) */
+  .magic-bento-card:nth-child(4) {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+
+  /* Card 5 - Normal size */
+  .magic-bento-card:nth-child(5) {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+
+  /* Card 6 - Normal size */
+  .magic-bento-card:nth-child(6) {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .magic-bento-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* Responsive Bento layout for desktop */
+  .magic-bento-card:nth-child(1) {
+    grid-column: span 1;
+  }
+
+  .magic-bento-card:nth-child(2) {
+    grid-column: span 2;
+  }
+
+  .magic-bento-card:nth-child(3) {
+    grid-column: span 1;
+  }
+
+  .magic-bento-card:nth-child(4) {
+    grid-column: span 2;
+  }
+
+  .magic-bento-card:nth-child(5) {
+    grid-column: span 1;
+  }
+
+  .magic-bento-card:nth-child(6) {
+    grid-column: span 1;
+  }
+}
+
+/* Magic Bento Card Styling */
+.magic-bento-card {
+  position: relative;
+  min-height: 280px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.magic-bento-card:nth-child(2),
+.magic-bento-card:nth-child(4) {
+  min-height: 300px;
+}
+
+/* Glow Effect - Cursor Following (Light Theme) */
+.magic-glow-effect.light-theme {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.7) 0%, rgba(99, 102, 241, 0.3) 30%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(30px);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: glowPulse 2s ease-in-out infinite;
+  box-shadow: 0 0 60px 15px rgba(59, 130, 246, 0.2);
+  mix-blend-mode: screen;
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.5;
+    filter: blur(30px);
+  }
+  50% {
+    opacity: 0.7;
+    filter: blur(25px);
+  }
+}
+
+/* Card hover effect */
+.magic-bento-card:hover {
+  transform: translateY(-6px);
+}
+
+.magic-bento-card:hover .magic-glow-effect.light-theme {
+  animation: glowPulse 1.5s ease-in-out infinite;
+}
+
+/* Smooth fade animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Card entrance animations from left and right */
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-60px) rotateY(10deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) rotateY(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(60px) rotateY(-10deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) rotateY(0);
+  }
+}
+
+/* Staggered animation classes for cards */
+.card-animate-left {
+  animation: slideInFromLeft 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+.card-animate-right {
+  animation: slideInFromRight 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+}
+
+/* Stagger delays for each card */
+.card-animate-left.delay-0 { animation-delay: 0s; }
+.card-animate-left.delay-1 { animation-delay: 0.15s; }
+.card-animate-left.delay-2 { animation-delay: 0.3s; }
+.card-animate-left.delay-3 { animation-delay: 0.45s; }
+.card-animate-left.delay-4 { animation-delay: 0.6s; }
+.card-animate-left.delay-5 { animation-delay: 0.75s; }
+
+.card-animate-right.delay-0 { animation-delay: 0s; }
+.card-animate-right.delay-1 { animation-delay: 0.15s; }
+.card-animate-right.delay-2 { animation-delay: 0.3s; }
+.card-animate-right.delay-3 { animation-delay: 0.45s; }
+.card-animate-right.delay-4 { animation-delay: 0.6s; }
+.card-animate-right.delay-5 { animation-delay: 0.75s; }
+
+/* Additional custom styles can be added here */
+
+/* Blob Animation */
+@keyframes blob {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
