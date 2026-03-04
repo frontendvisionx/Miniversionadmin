@@ -258,6 +258,28 @@ const CreateBusinessPage = () => {
     setCustomFields(newFields);
   };
 
+  // Delete Handler
+  const handleDelete = async () => {
+    if (!window.confirm(
+      'Are you sure you want to delete this business type? ' + 
+      'Existing vendors will still be able to use their created businesses, ' + 
+      'but new vendors will not see this type in the dropdown.'
+    )) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await businessAPI.deleteBusinessType(id);
+      toast.success('Business type deleted successfully!');
+      navigate('/admin/businesses');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete business type');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -833,6 +855,20 @@ const CreateBusinessPage = () => {
                   <>{isEditMode ? 'Update Business Type' : 'Create Business Type'}</>
                 )}
               </Button>
+              {isEditMode && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  onClick={handleDelete}
+                  disabled={loading}
+                  className="border-red-500 text-red-500 hover:bg-red-50"
+                  style={{ borderColor: '#EF4444', color: '#EF4444' }}
+                >
+                  <Trash2 size={18} style={{ marginRight: '8px' }} />
+                  Delete
+                </Button>
+              )}
             </div>
           </Card>
         </form>

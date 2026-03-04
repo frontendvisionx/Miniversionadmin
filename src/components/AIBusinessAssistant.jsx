@@ -24,7 +24,7 @@ const AIBusinessAssistant = ({ onSuggestionSelect: _onSuggestionSelect }) => {
     if (messages.length === 0) {
       setMessages([{
         role: 'assistant',
-        content: "👋 Hey! I'm your AI Business Assistant.\n\nI'm here to help you with all your business needs:\n\n• Suggest relevant business types for your marketplace\n• Create structured categories and subcategories\n• Analyze market trends and demand\n• Validate business ideas\n• Provide insights on vendor onboarding\n\nWhat would you like to know about businesses today?",
+        content: "👋 Hi! I'm your AI Assistant.\n\n✨ I can help you with:\n\n• Business type suggestions\n• Category & subcategory recommendations\n• Market insights & analysis\n• Strategy & business advice\n• Marketplace setup guidance\n\n💡 Try asking me:\n\"Give me 10 creative business types\"\n\"What categories for a restaurant?\"\n\"What's trending in 2026?\"\n\nJust ask me anything about your business!",
         timestamp: new Date().toISOString()
       }]);
     }
@@ -84,8 +84,9 @@ const AIBusinessAssistant = ({ onSuggestionSelect: _onSuggestionSelect }) => {
     setIsLoading(true);
 
     try {
-      // Prepare conversation history (last 5 messages for context)
-      const conversationHistory = messages.slice(-5).map(msg => ({
+      // ✅ FIXED: Only send last 2 messages for context, not full history
+      // This prevents Gemini from continuing old responses
+      const recentMessages = messages.slice(-2).map(msg => ({
         role: msg.role,
         content: msg.content
       }));
@@ -93,32 +94,39 @@ const AIBusinessAssistant = ({ onSuggestionSelect: _onSuggestionSelect }) => {
       // Get AI response
       const response = await aiSuggestionsAPI.getChatSuggestions(
         userMessage,
-        conversationHistory
+        recentMessages  // Only recent context
       );
 
       const aiData = response.data;
       
+      // ✅ Validation: Ensure response is not empty
+      if (!aiData.conversationalResponse || aiData.conversationalResponse.trim() === '') {
+        throw new Error('AI returned empty response. Please try again.');
+      }
+      
       // Add AI response to chat (conversational format)
       const aiMessage = {
         role: 'assistant',
-        content: aiData.conversationalResponse || 'Here are my suggestions:',
+        content: aiData.conversationalResponse,
         isConversational: aiData.isConversational || false,
         timestamp: new Date().toISOString()
       };
       
       setMessages(prev => [...prev, aiMessage]);
+      toast.success('Response received!');
 
     } catch (error) {
       console.error('AI Chat Error:', error);
       
       const errorMessage = {
         role: 'assistant',
-        content: `❌ ${error.message || 'Failed to get AI response. Please try again.'}`,
+        content: `❌ Error: ${error.message || 'Failed to get AI response. Please try again.'}`,
         isError: true,
         timestamp: new Date().toISOString()
       };
       
       setMessages(prev => [...prev, errorMessage]);
+      toast.error(error.message || 'Failed to get AI response');
     } finally {
       setIsLoading(false);
     }
@@ -135,6 +143,15 @@ const AIBusinessAssistant = ({ onSuggestionSelect: _onSuggestionSelect }) => {
     };
 
     setInputMessage(quickMessages[action] || '');
+  };
+
+  // ✅ NEW: Clear chat history to start fresh
+  const handleClearChat = () => {
+    setMessages([{
+      role: 'assistant',
+      content: "👋 Hi! I'm your AI Assistant.\n\n✨ I can help you with:\n\n• Business type suggestions\n• Category & subcategory recommendations\n• Market insights & analysis\n• Strategy & business advice\n• Marketplace setup guidance\n\n💡 Try asking me:\n\"Give me 10 creative business types\"\n\"What categories for a restaurant?\"\n\"What's trending in 2026?\"\n\nJust ask me anything about your business!",
+      timestamp: new Date().toISOString()
+    }]);
   };
 
   // Format AI message content with better readability
@@ -162,29 +179,60 @@ const AIBusinessAssistant = ({ onSuggestionSelect: _onSuggestionSelect }) => {
 
   return (
     <>
-      {/* Floating Chat Button */}
+      {/* Floating Chat Button - Production Level */}
       {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          style={{ 
-            background: `linear-gradient(135deg, ${COLORS.adminMain} 0%, ${COLORS.secondaryMain} 100%)`,
-          }}
-          className="fixed bottom-6 right-6 text-white p-4 rounded-full shadow-2xl hover:shadow-xl transition-all duration-300 hover:scale-110 z-50 group"
-          title="Open AI Business Assistant"
-        >
-          <Sparkles className="w-6 h-6" />
-          <span 
-            style={{ backgroundColor: COLORS.success }}
-            className="absolute -top-2 -right-2 text-white text-xs px-2 py-1 rounded-full animate-pulse font-semibold"
+        <div className="fixed bottom-8 right-8 z-50 group">
+          {/* Tooltip Text */}
+          <div className="absolute bottom-20 -right-2 bg-neutral-900 text-white px-4 py-3 rounded-xl text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 pointer-events-none shadow-xl">
+            <p className="font-semibold text-yellow-300">✨ I'm your AI Assistant</p>
+            <p className="text-neutral-200 text-xs mt-1">Ask me anything about business</p>
+            {/* Arrow */}
+            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-neutral-900 rotate-45"></div>
+          </div>
+
+          {/* Button */}
+          <button
+            onClick={() => setIsOpen(true)}
+            style={{ 
+              background: `linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)`,
+              boxShadow: '0 0 40px rgba(251, 191, 36, 0.3)'
+            }}
+            className="relative text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-125 hover:-translate-y-2 transform"
+            title="Click to chat with AI Assistant - Ask me anything about business!"
           >
-            AI
-          </span>
-        </button>
+            {/* Pulsing glow effect */}
+            <div 
+              className="absolute inset-0 rounded-full animate-pulse opacity-75"
+              style={{ 
+                background: 'radial-gradient(circle, #FBBF24, transparent)',
+                filter: 'blur(8px)'
+              }}
+            ></div>
+
+            {/* Icon Container */}
+            <div className="relative z-10 flex items-center justify-center">
+              <Sparkles className="w-7 h-7" />
+            </div>
+
+            {/* Status Badge */}
+            <span 
+              className="absolute -top-2 -right-2 text-white text-xs px-2 py-1 rounded-full font-bold animate-bounce"
+              style={{ backgroundColor: '#F59E0B' }}
+            >
+              AI
+            </span>
+
+            {/* Activity Indicator */}
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#F59E0B' }}>
+              <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+            </div>
+          </button>
+        </div>
       )}
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-[440px] h-[600px] bg-white rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden border border-gray-200">
+        <div className="fixed bottom-8 right-8 w-[440px] h-[600px] bg-white rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden border border-gray-200">
           {/* Header */}
           <div 
             style={{ 
@@ -197,19 +245,29 @@ const AIBusinessAssistant = ({ onSuggestionSelect: _onSuggestionSelect }) => {
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-semibold text-lg">AI Business Assistant</h3>
-                <p className="text-xs opacity-90">
+                <h3 className="font-semibold text-lg">AI Assistant</h3>
+                <p className="text-xs opacity-90 font-medium">
                   {isConfigured === false ? '⚠️ Not Configured' : 
                    isConfigured === true ? '🟢 Ready to assist' : '🔄 Checking...'}
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-white/80 hover:text-white hover:bg-white/10 p-2 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              {/* ✅ Clear Chat Button */}
+              <button
+                onClick={handleClearChat}
+                title="Clear conversation and start fresh"
+                className="text-white/80 hover:text-white hover:bg-white/10 p-2 rounded-lg transition-colors"
+              >
+                <span className="text-xs font-semibold">🔄</span>
+              </button>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-white/80 hover:text-white hover:bg-white/10 p-2 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Quick Actions */}

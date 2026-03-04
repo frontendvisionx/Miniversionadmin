@@ -77,22 +77,20 @@ export const Sidebar = ({ isOpen, onClose }) => {
       >
         {/* Header */}
         <div className="p-6 border-b border-neutral-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div 
-                className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg"
-                style={{ background: GRADIENTS.primary }}
-              >
-                A
-              </div>
-              <div>
-                <h1 className="text-lg font-bold text-neutral-900">Admin</h1>
-                <p className="text-xs text-neutral-500">Panel</p>
-              </div>
-            </div>
+          <div className="flex flex-col items-center justify-center">
+            <img 
+              src="/logo.png" 
+              alt="Mini Version" 
+              className="h-14 w-auto object-contain mb-2 mx-auto"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+            {/* <h1 className="text-base font-bold text-neutral-900 text-center">Mini Version</h1>
+            <p className="text-xs text-neutral-500 text-center">Management System</p> */}
             <button
               onClick={onClose}
-              className="lg:hidden p-2 hover:bg-neutral-100 rounded-lg transition-colors"
+              className="lg:hidden p-2 hover:bg-neutral-100 rounded-lg transition-colors flex-shrink-0 absolute top-4 right-4"
             >
               <X className="w-5 h-5" />
             </button>
